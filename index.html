@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>コンテンツカレンダー</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --surface-hover: #273548;
+  --border: rgba(148,163,184,0.15);
+  --text: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --radius: 10px;
+  --ch-blog: #6366f1;
+  --ch-sns: #f43f5e;
+  --ch-email: #14b8a6;
+  --ch-video: #f59e0b;
+  --ch-other: #8b5cf6;
+  --st-draft: #64748b;
+  --st-review: #f59e0b;
+  --st-published: #22c55e;
+}
+
+html { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", sans-serif; }
+body { background: var(--bg); color: var(--text); min-height: 100vh; }
+
+/* Header */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px; border-bottom: 1px solid var(--border);
+  flex-wrap: wrap; gap: 12px;
+}
+.header h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; }
+.nav-month {
+  display: flex; align-items: center; gap: 12px;
+}
+.nav-month button {
+  background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.nav-month button:hover { background: var(--surface-hover); }
+.nav-month .current-month {
+  font-size: 18px; font-weight: 700; min-width: 160px; text-align: center;
+}
+.btn-today {
+  background: var(--surface); border: 1px solid var(--border); color: var(--text-secondary);
+  padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600;
+  transition: background 0.15s;
+}
+.btn-today:hover { background: var(--surface-hover); color: var(--text); }
+
+/* Legend */
+.legend {
+  display: flex; gap: 16px; padding: 12px 24px; border-bottom: 1px solid var(--border);
+  flex-wrap: wrap; align-items: center;
+}
+.legend-title { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-right: 4px; }
+.legend-item {
+  display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); font-weight: 500;
+}
+.legend-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+}
+.legend-sep { width: 1px; height: 16px; background: var(--border); margin: 0 4px; }
+
+/* Calendar Grid */
+.calendar-container { padding: 16px; }
+.calendar {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+}
+.cal-dow {
+  text-align: center; font-size: 12px; font-weight: 700; color: var(--text-muted);
+  padding: 8px 4px; text-transform: uppercase;
+}
+.cal-dow.sun { color: #f43f5e; }
+.cal-dow.sat { color: #3b82f6; }
+
+.cal-cell {
+  min-height: 100px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 6px; cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  display: flex; flex-direction: column;
+}
+.cal-cell:hover { border-color: rgba(99,102,241,0.4); background: var(--surface-hover); }
+.cal-cell.other-month { opacity: 0.35; }
+.cal-cell.today { border-color: #6366f1; box-shadow: inset 0 0 0 1px #6366f1; }
+
+.cal-date {
+  font-size: 13px; font-weight: 700; margin-bottom: 4px; padding: 0 2px;
+}
+.cal-cell.sun .cal-date { color: #f43f5e; }
+.cal-cell.sat .cal-date { color: #3b82f6; }
+
+.cal-posts { flex: 1; display: flex; flex-direction: column; gap: 3px; overflow: hidden; }
+.cal-post {
+  font-size: 11px; padding: 3px 6px; border-radius: 4px; color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  cursor: pointer; font-weight: 600; position: relative;
+  line-height: 1.4;
+}
+.cal-post:hover { filter: brightness(1.2); }
+
+.cal-post[data-channel="blog"] { background: var(--ch-blog); }
+.cal-post[data-channel="sns"] { background: var(--ch-sns); }
+.cal-post[data-channel="email"] { background: var(--ch-email); }
+.cal-post[data-channel="video"] { background: var(--ch-video); }
+.cal-post[data-channel="other"] { background: var(--ch-other); }
+
+.cal-post .status-dot {
+  display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 3px; vertical-align: middle;
+}
+.cal-post .status-dot[data-status="draft"] { background: var(--st-draft); }
+.cal-post .status-dot[data-status="review"] { background: var(--st-review); }
+.cal-post .status-dot[data-status="published"] { background: var(--st-published); }
+
+.cal-more {
+  font-size: 10px; color: var(--text-muted); font-weight: 600; padding: 0 4px; cursor: pointer;
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+  z-index: 1000; align-items: center; justify-content: center; padding: 16px;
+}
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+}
+.modal-header h2 { font-size: 16px; font-weight: 800; }
+.modal-close {
+  background: none; border: none; color: var(--text-muted); cursor: pointer;
+  width: 32px; height: 32px; border-radius: 8px; font-size: 20px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s;
+}
+.modal-close:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+
+.modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-size: 13px; font-weight: 700; color: var(--text-secondary); }
+.form-group input, .form-group select {
+  background: var(--bg); border: 1px solid var(--border); color: var(--text);
+  padding: 10px 12px; border-radius: 8px; font-size: 14px; font-family: inherit;
+  outline: none; transition: border-color 0.15s;
+}
+.form-group input:focus, .form-group select:focus {
+  border-color: #6366f1;
+}
+.form-group select { cursor: pointer; }
+
+.modal-actions {
+  display: flex; gap: 10px; padding: 16px 24px 20px; border-top: 1px solid var(--border);
+}
+.btn {
+  flex: 1; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 700;
+  cursor: pointer; border: none; font-family: inherit; transition: all 0.15s;
+}
+.btn-save { background: #6366f1; color: #fff; }
+.btn-save:hover { background: #4f46e5; }
+.btn-cancel { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+.btn-cancel:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+.btn-delete { background: transparent; color: #f43f5e; border: 1px solid rgba(244,63,94,0.3); }
+.btn-delete:hover { background: rgba(244,63,94,0.1); }
+
+/* Day Detail Modal */
+.day-posts-list { display: flex; flex-direction: column; gap: 8px; }
+.day-post-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  background: var(--bg); border-radius: 8px; cursor: pointer;
+  transition: background 0.15s;
+}
+.day-post-item:hover { background: rgba(255,255,255,0.04); }
+.day-post-channel {
+  width: 8px; height: 32px; border-radius: 4px; flex-shrink: 0;
+}
+.day-post-channel[data-channel="blog"] { background: var(--ch-blog); }
+.day-post-channel[data-channel="sns"] { background: var(--ch-sns); }
+.day-post-channel[data-channel="email"] { background: var(--ch-email); }
+.day-post-channel[data-channel="video"] { background: var(--ch-video); }
+.day-post-channel[data-channel="other"] { background: var(--ch-other); }
+.day-post-info { flex: 1; min-width: 0; }
+.day-post-title { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.day-post-meta { font-size: 12px; color: var(--text-muted); }
+.day-post-status {
+  font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 100px; flex-shrink: 0;
+}
+.day-post-status[data-status="draft"] { background: rgba(100,116,139,0.2); color: #94a3b8; }
+.day-post-status[data-status="review"] { background: rgba(245,158,11,0.15); color: #fbbf24; }
+.day-post-status[data-status="published"] { background: rgba(34,197,94,0.15); color: #4ade80; }
+
+.btn-add-post {
+  width: 100%; padding: 10px; border-radius: 8px; border: 1px dashed var(--border);
+  background: transparent; color: var(--text-muted); font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: all 0.15s;
+}
+.btn-add-post:hover { border-color: #6366f1; color: #6366f1; background: rgba(99,102,241,0.05); }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header { padding: 12px 16px; }
+  .header h1 { font-size: 16px; }
+  .legend { padding: 10px 16px; gap: 10px; }
+  .calendar-container { padding: 8px; }
+  .calendar { gap: 2px; }
+  .cal-cell { min-height: 70px; padding: 4px; border-radius: 6px; }
+  .cal-date { font-size: 11px; }
+  .cal-post { font-size: 9px; padding: 2px 4px; }
+  .nav-month .current-month { font-size: 15px; min-width: 130px; }
+}
+
+@media (max-width: 480px) {
+  .cal-cell { min-height: 56px; }
+  .cal-post { font-size: 8px; padding: 1px 3px; }
+  .cal-post .status-dot { width: 4px; height: 4px; }
+  .legend-sep { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <h1>コンテンツカレンダー</h1>
+  <div class="nav-month">
+    <button id="prevMonth" aria-label="前月">&#8249;</button>
+    <span class="current-month" id="currentMonth"></span>
+    <button id="nextMonth" aria-label="次月">&#8250;</button>
+    <button class="btn-today" id="todayBtn">今日</button>
+  </div>
+</header>
+
+<!-- Legend -->
+<div class="legend">
+  <span class="legend-title">チャネル:</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--ch-blog)"></span>ブログ</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--ch-sns)"></span>SNS</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--ch-email)"></span>メール</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--ch-video)"></span>動画</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--ch-other)"></span>その他</span>
+  <span class="legend-sep"></span>
+  <span class="legend-title">ステータス:</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--st-draft)"></span>下書き</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--st-review)"></span>レビュー中</span>
+  <span class="legend-item"><span class="legend-dot" style="background:var(--st-published)"></span>公開済み</span>
+</div>
+
+<!-- Calendar -->
+<div class="calendar-container">
+  <div class="calendar" id="calendar"></div>
+</div>
+
+<!-- Day Detail Modal -->
+<div class="modal-overlay" id="dayModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="dayModalTitle"></h2>
+      <button class="modal-close" id="dayModalClose">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="day-posts-list" id="dayPostsList"></div>
+      <button class="btn-add-post" id="dayAddPost">+ 投稿を追加</button>
+    </div>
+  </div>
+</div>
+
+<!-- Post Edit Modal -->
+<div class="modal-overlay" id="postModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="postModalTitle">投稿を追加</h2>
+      <button class="modal-close" id="postModalClose">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="postTitle">タイトル</label>
+        <input type="text" id="postTitle" placeholder="投稿タイトルを入力">
+      </div>
+      <div class="form-group">
+        <label for="postChannel">チャネル</label>
+        <select id="postChannel">
+          <option value="blog">ブログ</option>
+          <option value="sns">SNS</option>
+          <option value="email">メール</option>
+          <option value="video">動画</option>
+          <option value="other">その他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="postStatus">ステータス</label>
+        <select id="postStatus">
+          <option value="draft">下書き</option>
+          <option value="review">レビュー中</option>
+          <option value="published">公開済み</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions" id="postModalActions">
+      <button class="btn btn-cancel" id="postCancel">キャンセル</button>
+      <button class="btn btn-save" id="postSave">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  var STORAGE_KEY = 'content-calendar-posts';
+  var MAX_VISIBLE_POSTS = 3;
+
+  var channelLabels = { blog: 'ブログ', sns: 'SNS', email: 'メール', video: '動画', other: 'その他' };
+  var statusLabels = { draft: '下書き', review: 'レビュー中', published: '公開済み' };
+
+  var currentYear, currentMonth;
+  var posts = loadPosts();
+  var editingPostId = null;
+  var selectedDate = null;
+
+  // Elements
+  var calendarEl = document.getElementById('calendar');
+  var currentMonthEl = document.getElementById('currentMonth');
+  var prevMonthBtn = document.getElementById('prevMonth');
+  var nextMonthBtn = document.getElementById('nextMonth');
+  var todayBtn = document.getElementById('todayBtn');
+  var dayModal = document.getElementById('dayModal');
+  var dayModalTitle = document.getElementById('dayModalTitle');
+  var dayModalClose = document.getElementById('dayModalClose');
+  var dayPostsList = document.getElementById('dayPostsList');
+  var dayAddPost = document.getElementById('dayAddPost');
+  var postModal = document.getElementById('postModal');
+  var postModalTitle = document.getElementById('postModalTitle');
+  var postModalClose = document.getElementById('postModalClose');
+  var postTitle = document.getElementById('postTitle');
+  var postChannel = document.getElementById('postChannel');
+  var postStatus = document.getElementById('postStatus');
+  var postSave = document.getElementById('postSave');
+  var postCancel = document.getElementById('postCancel');
+  var postModalActions = document.getElementById('postModalActions');
+
+  function loadPosts() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    } catch(e) {
+      return {};
+    }
+  }
+
+  function savePosts() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
+  }
+
+  function dateKey(y, m, d) {
+    return y + '-' + String(m + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+  }
+
+  function generateId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+  }
+
+  function init() {
+    var now = new Date();
+    currentYear = now.getFullYear();
+    currentMonth = now.getMonth();
+    render();
+  }
+
+  function render() {
+    currentMonthEl.textContent = currentYear + '年 ' + (currentMonth + 1) + '月';
+    renderCalendar();
+  }
+
+  function renderCalendar() {
+    calendarEl.innerHTML = '';
+
+    var dowLabels = ['日', '月', '火', '水', '木', '金', '土'];
+    for (var i = 0; i < 7; i++) {
+      var dowEl = document.createElement('div');
+      dowEl.className = 'cal-dow';
+      if (i === 0) dowEl.classList.add('sun');
+      if (i === 6) dowEl.classList.add('sat');
+      dowEl.textContent = dowLabels[i];
+      calendarEl.appendChild(dowEl);
+    }
+
+    var firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    var daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    var prevDays = new Date(currentYear, currentMonth, 0).getDate();
+
+    var today = new Date();
+    var todayKey = dateKey(today.getFullYear(), today.getMonth(), today.getDate());
+
+    // Previous month cells
+    for (var p = firstDay - 1; p >= 0; p--) {
+      var pDay = prevDays - p;
+      var pMonth = currentMonth - 1;
+      var pYear = currentYear;
+      if (pMonth < 0) { pMonth = 11; pYear--; }
+      createCell(pYear, pMonth, pDay, true, todayKey);
+    }
+
+    // Current month cells
+    for (var d = 1; d <= daysInMonth; d++) {
+      createCell(currentYear, currentMonth, d, false, todayKey);
+    }
+
+    // Next month cells
+    var totalCells = firstDay + daysInMonth;
+    var remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+    for (var n = 1; n <= remaining; n++) {
+      var nMonth = currentMonth + 1;
+      var nYear = currentYear;
+      if (nMonth > 11) { nMonth = 0; nYear++; }
+      createCell(nYear, nMonth, n, true, todayKey);
+    }
+  }
+
+  function createCell(year, month, day, isOther, todayKey) {
+    var key = dateKey(year, month, day);
+    var dow = new Date(year, month, day).getDay();
+
+    var cell = document.createElement('div');
+    cell.className = 'cal-cell';
+    if (isOther) cell.classList.add('other-month');
+    if (key === todayKey) cell.classList.add('today');
+    if (dow === 0) cell.classList.add('sun');
+    if (dow === 6) cell.classList.add('sat');
+
+    var dateEl = document.createElement('div');
+    dateEl.className = 'cal-date';
+    dateEl.textContent = day;
+    cell.appendChild(dateEl);
+
+    var postsContainer = document.createElement('div');
+    postsContainer.className = 'cal-posts';
+
+    var dayPosts = posts[key] || [];
+    var visibleCount = Math.min(dayPosts.length, MAX_VISIBLE_POSTS);
+
+    for (var i = 0; i < visibleCount; i++) {
+      var post = dayPosts[i];
+      var postEl = document.createElement('div');
+      postEl.className = 'cal-post';
+      postEl.setAttribute('data-channel', post.channel);
+      postEl.innerHTML = '<span class="status-dot" data-status="' + post.status + '"></span>' + escapeHtml(post.title);
+      postEl.addEventListener('click', (function(k, pid) {
+        return function(e) {
+          e.stopPropagation();
+          openPostEdit(k, pid);
+        };
+      })(key, post.id));
+      postsContainer.appendChild(postEl);
+    }
+
+    if (dayPosts.length > MAX_VISIBLE_POSTS) {
+      var moreEl = document.createElement('div');
+      moreEl.className = 'cal-more';
+      moreEl.textContent = '+' + (dayPosts.length - MAX_VISIBLE_POSTS) + '件';
+      postsContainer.appendChild(moreEl);
+    }
+
+    cell.appendChild(postsContainer);
+
+    cell.addEventListener('click', function() {
+      openDayModal(key, year, month, day);
+    });
+
+    calendarEl.appendChild(cell);
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+  }
+
+  // Day Modal
+  function openDayModal(key, year, month, day) {
+    selectedDate = key;
+    dayModalTitle.textContent = year + '年' + (month + 1) + '月' + day + '日の投稿';
+    renderDayPosts();
+    dayModal.classList.add('active');
+  }
+
+  function renderDayPosts() {
+    dayPostsList.innerHTML = '';
+    var dayPosts = posts[selectedDate] || [];
+
+    if (dayPosts.length === 0) {
+      var empty = document.createElement('div');
+      empty.style.cssText = 'text-align:center; padding:20px; color:var(--text-muted); font-size:14px;';
+      empty.textContent = '投稿がありません';
+      dayPostsList.appendChild(empty);
+      return;
+    }
+
+    dayPosts.forEach(function(post) {
+      var item = document.createElement('div');
+      item.className = 'day-post-item';
+      item.innerHTML =
+        '<div class="day-post-channel" data-channel="' + post.channel + '"></div>' +
+        '<div class="day-post-info">' +
+          '<div class="day-post-title">' + escapeHtml(post.title) + '</div>' +
+          '<div class="day-post-meta">' + channelLabels[post.channel] + '</div>' +
+        '</div>' +
+        '<span class="day-post-status" data-status="' + post.status + '">' + statusLabels[post.status] + '</span>';
+      item.addEventListener('click', function() {
+        closeDayModal();
+        openPostEdit(selectedDate, post.id);
+      });
+      dayPostsList.appendChild(item);
+    });
+  }
+
+  function closeDayModal() {
+    dayModal.classList.remove('active');
+  }
+
+  dayModalClose.addEventListener('click', closeDayModal);
+  dayModal.addEventListener('click', function(e) {
+    if (e.target === dayModal) closeDayModal();
+  });
+
+  dayAddPost.addEventListener('click', function() {
+    closeDayModal();
+    openPostAdd(selectedDate);
+  });
+
+  // Post Modal
+  function openPostAdd(key) {
+    editingPostId = null;
+    selectedDate = key;
+    postModalTitle.textContent = '投稿を追加';
+    postTitle.value = '';
+    postChannel.value = 'blog';
+    postStatus.value = 'draft';
+
+    // Remove delete button if exists
+    var existingDelete = document.getElementById('postDelete');
+    if (existingDelete) existingDelete.remove();
+
+    postModal.classList.add('active');
+    postTitle.focus();
+  }
+
+  function openPostEdit(key, postId) {
+    selectedDate = key;
+    editingPostId = postId;
+    var dayPosts = posts[key] || [];
+    var post = dayPosts.find(function(p) { return p.id === postId; });
+    if (!post) return;
+
+    postModalTitle.textContent = '投稿を編集';
+    postTitle.value = post.title;
+    postChannel.value = post.channel;
+    postStatus.value = post.status;
+
+    // Add delete button
+    var existingDelete = document.getElementById('postDelete');
+    if (existingDelete) existingDelete.remove();
+
+    var deleteBtn = document.createElement('button');
+    deleteBtn.id = 'postDelete';
+    deleteBtn.className = 'btn btn-delete';
+    deleteBtn.textContent = '削除';
+    deleteBtn.addEventListener('click', function() {
+      deletePost(key, postId);
+    });
+    postModalActions.insertBefore(deleteBtn, postModalActions.firstChild);
+
+    postModal.classList.add('active');
+    postTitle.focus();
+  }
+
+  function closePostModal() {
+    postModal.classList.remove('active');
+    editingPostId = null;
+  }
+
+  postModalClose.addEventListener('click', closePostModal);
+  postCancel.addEventListener('click', closePostModal);
+  postModal.addEventListener('click', function(e) {
+    if (e.target === postModal) closePostModal();
+  });
+
+  postSave.addEventListener('click', function() {
+    var title = postTitle.value.trim();
+    if (!title) {
+      postTitle.style.borderColor = '#f43f5e';
+      postTitle.focus();
+      return;
+    }
+    postTitle.style.borderColor = '';
+
+    if (!posts[selectedDate]) posts[selectedDate] = [];
+
+    if (editingPostId) {
+      var post = posts[selectedDate].find(function(p) { return p.id === editingPostId; });
+      if (post) {
+        post.title = title;
+        post.channel = postChannel.value;
+        post.status = postStatus.value;
+      }
+    } else {
+      posts[selectedDate].push({
+        id: generateId(),
+        title: title,
+        channel: postChannel.value,
+        status: postStatus.value
+      });
+    }
+
+    savePosts();
+    closePostModal();
+    render();
+  });
+
+  function deletePost(key, postId) {
+    if (!posts[key]) return;
+    posts[key] = posts[key].filter(function(p) { return p.id !== postId; });
+    if (posts[key].length === 0) delete posts[key];
+    savePosts();
+    closePostModal();
+    render();
+  }
+
+  // Keyboard
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (postModal.classList.contains('active')) closePostModal();
+      else if (dayModal.classList.contains('active')) closeDayModal();
+    }
+  });
+
+  // Navigation
+  prevMonthBtn.addEventListener('click', function() {
+    currentMonth--;
+    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+    render();
+  });
+
+  nextMonthBtn.addEventListener('click', function() {
+    currentMonth++;
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    render();
+  });
+
+  todayBtn.addEventListener('click', function() {
+    var now = new Date();
+    currentYear = now.getFullYear();
+    currentMonth = now.getMonth();
+    render();
+  });
+
+  init();
+})();
+</script>
+</body>
+</html>
