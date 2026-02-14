@@ -1,0 +1,32 @@
+name: Weekly SEO Audit
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # テスト用：5分ごと（動作確認後に毎週月曜に変更）
+  workflow_dispatch:  # 手動実行も可能
+
+jobs:
+  seo-audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            index.html のSEO監査を行い、結果をGitHub Issueとして作成してください。
+
+            チェック項目：
+            - タイトルタグ（60文字以内か）
+            - メタディスクリプション（120文字以内、日本語）
+            - 見出し構造（H1→H2→H3の階層）
+            - 画像のalt属性
+            - モバイルフレンドリー
+            - Core Web Vitalsに影響する要素
+            - アクセシビリティ
+
+            Issueのタイトルは「週次SEO監査レポート: YYYY-MM-DD」としてください。
+          claude_args: "--max-turns 10"
