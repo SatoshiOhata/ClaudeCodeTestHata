@@ -30,4 +30,5 @@ jobs:
             - アクセシビリティ
 
             Issueのタイトルは「週次SEO監査レポート: YYYY-MM-DD」としてください。
+          allowed_tools: "Bash(gh issue create*),Write"
           claude_args: "--max-turns 10"
