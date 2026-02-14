@@ -2,8 +2,8 @@ name: Weekly SEO Audit
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # テスト用：5分ごと（動作確認後に毎週月曜に変更）
-  workflow_dispatch:  # 手動実行も可能
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
 
 jobs:
   seo-audit:
@@ -14,21 +14,28 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
-      - uses: anthropics/claude-code-action@v1
+
+      - name: Run Claude SEO Audit
+        id: audit
+        uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
-            index.html のSEO監査を行い、結果をGitHub Issueとして作成してください。
+            index.html のSEO監査を行ってください。
+            チェック項目：タイトルタグ、メタディスクリプション、見出し構造、画像alt属性、モバイルフレンドリー、Core Web Vitals、アクセシビリティ
+            各項目を「✅ 合格 / ⚠️ 改善推奨 / ❌ 要修正」で評価し、改善案を優先度順に提示してください。
+            結果はMarkdown形式で出力してください。
+          claude_args: "--max-turns 5"
 
-            チェック項目：
-            - タイトルタグ（60文字以内か）
-            - メタディスクリプション（120文字以内、日本語）
-            - 見出し構造（H1→H2→H3の階層）
-            - 画像のalt属性
-            - モバイルフレンドリー
-            - Core Web Vitalsに影響する要素
-            - アクセシビリティ
-
-            Issueのタイトルは「週次SEO監査レポート: YYYY-MM-DD」としてください。
-          additional_permissions: "Bash(gh issue create*),Write"
-          claude_args: "--max-turns 10"
+      - name: Create Issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const date = new Date().toISOString().split('T')[0];
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `週次SEO監査レポート: ${date}`,
+              body: `${{ steps.audit.outputs.result }}`.slice(0, 65000),
+              labels: ['seo-audit']
+            });
