@@ -6,6 +6,7 @@
 <title>コンテンツカレンダー - ブログ・SNS投稿スケジュール管理ツール</title>
 <meta name="description" content="ブログ・SNS・メール・動画の投稿スケジュールをカレンダーで一元管理。チャネル別・ステータス別に投稿を整理し、コンテンツマーケティングの計画を効率化できる無料ツールです。">
 <link rel="canonical" href="https://example.com/">
+<link rel="icon" href="/favicon.ico">
 <meta property="og:type" content="website">
 <meta property="og:title" content="コンテンツカレンダー - ブログ・SNS投稿スケジュール管理ツール">
 <meta property="og:description" content="ブログ・SNS・メール・動画の投稿スケジュールをカレンダーで一元管理。コンテンツマーケティングの計画を効率化できる無料ツールです。">
@@ -43,7 +44,7 @@
   --border: rgba(148,163,184,0.15);
   --text: #f1f5f9;
   --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-muted: #8494a7;
   --radius: 10px;
   --ch-blog: #6366f1;
   --ch-sns: #f43f5e;
@@ -53,10 +54,16 @@
   --st-draft: #64748b;
   --st-review: #f59e0b;
   --st-published: #22c55e;
+  --transition-speed: 0.15s;
 }
 
 html { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", sans-serif; }
-body { background: var(--bg); color: var(--text); min-height: 100vh; }
+body { background: var(--bg); color: var(--text); min-height: 100vh; font-size: 16px; line-height: 1.6; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
 
 /* Header */
 .header {
@@ -74,9 +81,9 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
 }
 .nav-month button {
   background: var(--surface); border: 1px solid var(--border); color: var(--text);
-  width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 18px;
+  width: 44px; height: 44px; border-radius: 8px; cursor: pointer; font-size: 18px;
   display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s;
+  transition: background var(--transition-speed);
 }
 .nav-month button:hover { background: var(--surface-hover); }
 .nav-month .current-month {
@@ -85,7 +92,7 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
 .btn-today {
   background: var(--surface); border: 1px solid var(--border); color: var(--text-secondary);
   padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600;
-  transition: background 0.15s;
+  transition: background var(--transition-speed);
 }
 .btn-today:hover { background: var(--surface-hover); color: var(--text); }
 
@@ -118,7 +125,7 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
 .cal-cell {
   min-height: 100px; background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 6px; cursor: pointer;
-  transition: border-color 0.15s, background 0.15s, transform 0.15s, box-shadow 0.15s;
+  transition: border-color var(--transition-speed), background var(--transition-speed), transform var(--transition-speed), box-shadow var(--transition-speed);
   display: flex; flex-direction: column;
 }
 .cal-cell:hover { border-color: rgba(99,102,241,0.4); background: #273a52; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
@@ -178,7 +185,7 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
   background: none; border: none; color: var(--text-muted); cursor: pointer;
   width: 32px; height: 32px; border-radius: 8px; font-size: 20px;
   display: flex; align-items: center; justify-content: center;
-  transition: background 0.15s;
+  transition: background var(--transition-speed);
 }
 .modal-close:hover { background: rgba(255,255,255,0.06); color: var(--text); }
 
@@ -188,7 +195,7 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
 .form-group input, .form-group select {
   background: var(--bg); border: 1px solid var(--border); color: var(--text);
   padding: 10px 12px; border-radius: 8px; font-size: 14px; font-family: inherit;
-  outline: none; transition: border-color 0.15s;
+  outline: none; transition: border-color var(--transition-speed);
 }
 .form-group input:focus, .form-group select:focus {
   border-color: #6366f1;
@@ -200,7 +207,7 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
 }
 .btn {
   flex: 1; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 700;
-  cursor: pointer; border: none; font-family: inherit; transition: all 0.15s;
+  cursor: pointer; border: none; font-family: inherit; transition: all var(--transition-speed);
 }
 .btn-save { background: #6366f1; color: #fff; }
 .btn-save:hover { background: #4f46e5; }
@@ -214,7 +221,7 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
 .day-post-item {
   display: flex; align-items: center; gap: 10px; padding: 10px 12px;
   background: var(--bg); border-radius: 8px; cursor: pointer;
-  transition: background 0.15s;
+  transition: background var(--transition-speed);
 }
 .day-post-item:hover { background: rgba(255,255,255,0.04); }
 .day-post-channel {
@@ -238,7 +245,7 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
 .btn-add-post {
   width: 100%; padding: 10px; border-radius: 8px; border: 1px dashed var(--border);
   background: transparent; color: var(--text-muted); font-size: 13px; font-weight: 600;
-  cursor: pointer; font-family: inherit; transition: all 0.15s;
+  cursor: pointer; font-family: inherit; transition: all var(--transition-speed);
 }
 .btn-add-post:hover { border-color: #6366f1; color: #6366f1; background: rgba(99,102,241,0.05); }
 
@@ -249,6 +256,12 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+  .header { padding: 14px 20px; }
+  .legend { padding: 10px 20px; }
+  .calendar-container { padding: 12px; }
+}
+
 @media (max-width: 768px) {
   .header { padding: 12px 16px; }
   .header h1 { font-size: 16px; }
@@ -274,16 +287,17 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
 <!-- Header -->
 <header class="header">
   <h1>コンテンツカレンダー <span class="post-count-badge" id="postCountBadge">0件</span></h1>
-  <div class="nav-month">
+  <nav aria-label="月ナビゲーション" class="nav-month">
     <button id="prevMonth" aria-label="前月">&#8249;</button>
     <span class="current-month" id="currentMonth"></span>
     <button id="nextMonth" aria-label="次月">&#8250;</button>
     <button class="btn-today" id="todayBtn">今日</button>
-  </div>
+  </nav>
 </header>
 
 <!-- Legend -->
-<div class="legend">
+<section class="legend" aria-label="凡例">
+  <h2 class="sr-only">チャネルとステータスの凡例</h2>
   <span class="legend-title">チャネル:</span>
   <span class="legend-item"><span class="legend-dot" style="background:var(--ch-blog)"></span>ブログ</span>
   <span class="legend-item"><span class="legend-dot" style="background:var(--ch-sns)"></span>SNS</span>
@@ -295,22 +309,26 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
   <span class="legend-item"><span class="legend-dot" style="background:var(--st-draft)"></span>下書き</span>
   <span class="legend-item"><span class="legend-dot" style="background:var(--st-review)"></span>レビュー中</span>
   <span class="legend-item"><span class="legend-dot" style="background:var(--st-published)"></span>公開済み</span>
-</div>
+</section>
 
 <!-- Calendar -->
-<div class="calendar-container">
-  <div class="calendar" id="calendar"></div>
-</div>
+<main>
+  <section class="calendar-container" aria-label="カレンダー">
+    <h2 class="sr-only">投稿カレンダー</h2>
+    <div class="calendar" id="calendar" role="grid" aria-label="コンテンツカレンダー"></div>
+  </section>
+  <noscript><p style="text-align:center; padding:40px 20px; color:#94a3b8;">このアプリケーションの利用にはJavaScriptを有効にする必要があります。</p></noscript>
+</main>
 
 <!-- Footer -->
 <footer class="footer">Powered by Claude Code</footer>
 
 <!-- Day Detail Modal -->
-<div class="modal-overlay" id="dayModal">
+<div class="modal-overlay" id="dayModal" role="dialog" aria-modal="true" aria-labelledby="dayModalTitle">
   <div class="modal">
     <div class="modal-header">
       <h2 id="dayModalTitle"></h2>
-      <button class="modal-close" id="dayModalClose">&times;</button>
+      <button class="modal-close" id="dayModalClose" aria-label="閉じる">&times;</button>
     </div>
     <div class="modal-body">
       <div class="day-posts-list" id="dayPostsList"></div>
@@ -320,11 +338,11 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
 </div>
 
 <!-- Post Edit Modal -->
-<div class="modal-overlay" id="postModal">
+<div class="modal-overlay" id="postModal" role="dialog" aria-modal="true" aria-labelledby="postModalTitle">
   <div class="modal">
     <div class="modal-header">
       <h2 id="postModalTitle">投稿を追加</h2>
-      <button class="modal-close" id="postModalClose">&times;</button>
+      <button class="modal-close" id="postModalClose" aria-label="閉じる">&times;</button>
     </div>
     <div class="modal-body">
       <div class="form-group">
@@ -371,6 +389,7 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
   var posts = loadPosts();
   var editingPostId = null;
   var selectedDate = null;
+  var lastFocusedElement = null;
 
   // Elements
   var calendarEl = document.getElementById('calendar');
@@ -440,7 +459,7 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
   }
 
   function renderCalendar() {
-    calendarEl.innerHTML = '';
+    var fragment = document.createDocumentFragment();
 
     var dowLabels = ['日', '月', '火', '水', '木', '金', '土'];
     for (var i = 0; i < 7; i++) {
@@ -448,8 +467,9 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
       dowEl.className = 'cal-dow';
       if (i === 0) dowEl.classList.add('sun');
       if (i === 6) dowEl.classList.add('sat');
+      dowEl.setAttribute('role', 'columnheader');
       dowEl.textContent = dowLabels[i];
-      calendarEl.appendChild(dowEl);
+      fragment.appendChild(dowEl);
     }
 
     var firstDay = new Date(currentYear, currentMonth, 1).getDay();
@@ -465,12 +485,12 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
       var pMonth = currentMonth - 1;
       var pYear = currentYear;
       if (pMonth < 0) { pMonth = 11; pYear--; }
-      createCell(pYear, pMonth, pDay, true, todayKey);
+      fragment.appendChild(createCell(pYear, pMonth, pDay, true, todayKey));
     }
 
     // Current month cells
     for (var d = 1; d <= daysInMonth; d++) {
-      createCell(currentYear, currentMonth, d, false, todayKey);
+      fragment.appendChild(createCell(currentYear, currentMonth, d, false, todayKey));
     }
 
     // Next month cells
@@ -480,8 +500,11 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
       var nMonth = currentMonth + 1;
       var nYear = currentYear;
       if (nMonth > 11) { nMonth = 0; nYear++; }
-      createCell(nYear, nMonth, n, true, todayKey);
+      fragment.appendChild(createCell(nYear, nMonth, n, true, todayKey));
     }
+
+    calendarEl.textContent = '';
+    calendarEl.appendChild(fragment);
   }
 
   function createCell(year, month, day, isOther, todayKey) {
@@ -490,6 +513,12 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
 
     var cell = document.createElement('div');
     cell.className = 'cal-cell';
+    cell.setAttribute('role', 'gridcell');
+    cell.setAttribute('data-date-key', key);
+    cell.setAttribute('data-year', year);
+    cell.setAttribute('data-month', month);
+    cell.setAttribute('data-day', day);
+    cell.setAttribute('aria-label', year + '年' + (month + 1) + '月' + day + '日');
     if (isOther) cell.classList.add('other-month');
     if (key === todayKey) cell.classList.add('today');
     if (dow === 0) cell.classList.add('sun');
@@ -511,13 +540,15 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
       var postEl = document.createElement('div');
       postEl.className = 'cal-post';
       postEl.setAttribute('data-channel', post.channel);
-      postEl.innerHTML = '<span class="status-dot" data-status="' + post.status + '"></span>' + escapeHtml(post.title);
-      postEl.addEventListener('click', (function(k, pid) {
-        return function(e) {
-          e.stopPropagation();
-          openPostEdit(k, pid);
-        };
-      })(key, post.id));
+      postEl.setAttribute('data-post-id', post.id);
+      postEl.setAttribute('data-date-key', key);
+
+      var statusDot = document.createElement('span');
+      statusDot.className = 'status-dot';
+      statusDot.setAttribute('data-status', post.status);
+      postEl.appendChild(statusDot);
+      postEl.appendChild(document.createTextNode(post.title));
+
       postsContainer.appendChild(postEl);
     }
 
@@ -529,18 +560,63 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
     }
 
     cell.appendChild(postsContainer);
-
-    cell.addEventListener('click', function() {
-      openDayModal(key, year, month, day);
-    });
-
-    calendarEl.appendChild(cell);
+    return cell;
   }
 
-  function escapeHtml(str) {
-    var div = document.createElement('div');
-    div.appendChild(document.createTextNode(str));
-    return div.innerHTML;
+  // Event Delegation for Calendar
+  calendarEl.addEventListener('click', function(e) {
+    var postEl = e.target.closest('.cal-post');
+    if (postEl) {
+      var postId = postEl.getAttribute('data-post-id');
+      var key = postEl.getAttribute('data-date-key');
+      if (postId && key) {
+        openPostEdit(key, postId);
+      }
+      return;
+    }
+
+    var cellEl = e.target.closest('.cal-cell');
+    if (cellEl) {
+      var key = cellEl.getAttribute('data-date-key');
+      var year = parseInt(cellEl.getAttribute('data-year'), 10);
+      var month = parseInt(cellEl.getAttribute('data-month'), 10);
+      var day = parseInt(cellEl.getAttribute('data-day'), 10);
+      openDayModal(key, year, month, day);
+    }
+  });
+
+  // Focus Trap utility
+  function trapFocus(modalOverlay) {
+    var focusable = modalOverlay.querySelectorAll('button, input, select, textarea, a[href], [tabindex]:not([tabindex="-1"])');
+    if (focusable.length === 0) return;
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+
+    modalOverlay.addEventListener('keydown', function(e) {
+      if (e.key !== 'Tab') return;
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    });
+  }
+
+  trapFocus(dayModal);
+  trapFocus(postModal);
+
+  // Modal open/close helpers
+  function openModal(overlay, focusEl) {
+    lastFocusedElement = document.activeElement;
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    if (focusEl) focusEl.focus();
+  }
+
+  function closeModal(overlay) {
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    if (lastFocusedElement) lastFocusedElement.focus();
   }
 
   // Day Modal
@@ -548,41 +624,61 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
     selectedDate = key;
     dayModalTitle.textContent = year + '年' + (month + 1) + '月' + day + '日の投稿';
     renderDayPosts();
-    dayModal.classList.add('active');
+    openModal(dayModal, dayModalClose);
   }
 
   function renderDayPosts() {
-    dayPostsList.innerHTML = '';
+    var fragment = document.createDocumentFragment();
     var dayPosts = posts[selectedDate] || [];
 
     if (dayPosts.length === 0) {
       var empty = document.createElement('div');
       empty.style.cssText = 'text-align:center; padding:20px; color:var(--text-muted); font-size:14px;';
       empty.textContent = '投稿がありません';
-      dayPostsList.appendChild(empty);
-      return;
+      fragment.appendChild(empty);
+    } else {
+      dayPosts.forEach(function(post) {
+        var item = document.createElement('div');
+        item.className = 'day-post-item';
+        item.setAttribute('data-post-id', post.id);
+
+        var channelBar = document.createElement('div');
+        channelBar.className = 'day-post-channel';
+        channelBar.setAttribute('data-channel', post.channel);
+        item.appendChild(channelBar);
+
+        var info = document.createElement('div');
+        info.className = 'day-post-info';
+        var titleEl = document.createElement('div');
+        titleEl.className = 'day-post-title';
+        titleEl.textContent = post.title;
+        info.appendChild(titleEl);
+        var meta = document.createElement('div');
+        meta.className = 'day-post-meta';
+        meta.textContent = channelLabels[post.channel];
+        info.appendChild(meta);
+        item.appendChild(info);
+
+        var statusEl = document.createElement('span');
+        statusEl.className = 'day-post-status';
+        statusEl.setAttribute('data-status', post.status);
+        statusEl.textContent = statusLabels[post.status];
+        item.appendChild(statusEl);
+
+        item.addEventListener('click', function() {
+          closeDayModal();
+          openPostEdit(selectedDate, post.id);
+        });
+        fragment.appendChild(item);
+      });
     }
 
-    dayPosts.forEach(function(post) {
-      var item = document.createElement('div');
-      item.className = 'day-post-item';
-      item.innerHTML =
-        '<div class="day-post-channel" data-channel="' + post.channel + '"></div>' +
-        '<div class="day-post-info">' +
-          '<div class="day-post-title">' + escapeHtml(post.title) + '</div>' +
-          '<div class="day-post-meta">' + channelLabels[post.channel] + '</div>' +
-        '</div>' +
-        '<span class="day-post-status" data-status="' + post.status + '">' + statusLabels[post.status] + '</span>';
-      item.addEventListener('click', function() {
-        closeDayModal();
-        openPostEdit(selectedDate, post.id);
-      });
-      dayPostsList.appendChild(item);
-    });
+    dayPostsList.textContent = '';
+    dayPostsList.appendChild(fragment);
   }
 
   function closeDayModal() {
-    dayModal.classList.remove('active');
+    closeModal(dayModal);
   }
 
   dayModalClose.addEventListener('click', closeDayModal);
@@ -608,8 +704,7 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
     var existingDelete = document.getElementById('postDelete');
     if (existingDelete) existingDelete.remove();
 
-    postModal.classList.add('active');
-    postTitle.focus();
+    openModal(postModal, postTitle);
   }
 
   function openPostEdit(key, postId) {
@@ -637,12 +732,11 @@ body { background: var(--bg); color: var(--text); min-height: 100vh; }
     });
     postModalActions.insertBefore(deleteBtn, postModalActions.firstChild);
 
-    postModal.classList.add('active');
-    postTitle.focus();
+    openModal(postModal, postTitle);
   }
 
   function closePostModal() {
-    postModal.classList.remove('active');
+    closeModal(postModal);
     editingPostId = null;
   }
 
