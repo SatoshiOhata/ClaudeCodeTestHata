@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$comment": "Zendesk Google Slides テンプレートのプレースホルダーマッピング定義。実際のテンプレートに合わせてカスタマイズしてください。",
+  "metadata": {
+    "template_name": "Zendesk Presentation Template",
+    "template_id": "<YOUR_TEMPLATE_PRESENTATION_ID>",
+    "description": "Zendeskブランドのプレゼンテーションテンプレート"
+  },
+  "placeholders": {
+    "title": {
+      "placeholder": "{{title}}",
+      "description": "プレゼンテーションのメインタイトル",
+      "example": "Q1 2026 ビジネスレビュー",
+      "slide": 1
+    },
+    "subtitle": {
+      "placeholder": "{{subtitle}}",
+      "description": "サブタイトル",
+      "example": "カスタマーサポート部門",
+      "slide": 1
+    },
+    "date": {
+      "placeholder": "{{date}}",
+      "description": "日付",
+      "example": "2026年3月9日",
+      "slide": 1
+    },
+    "author": {
+      "placeholder": "{{author}}",
+      "description": "作成者名",
+      "example": "Satoshi Ohata",
+      "slide": 1
+    },
+    "section_title": {
+      "placeholder": "{{section_title}}",
+      "description": "セクションの見出し（複数スライドで利用可能）",
+      "example": "主要KPIの推移"
+    },
+    "body_text": {
+      "placeholder": "{{body_text}}",
+      "description": "本文テキスト",
+      "example": "今四半期の顧客満足度は前期比5%向上しました。"
+    },
+    "metric_value": {
+      "placeholder": "{{metric_value}}",
+      "description": "KPI数値",
+      "example": "92.5%"
+    },
+    "metric_label": {
+      "placeholder": "{{metric_label}}",
+      "description": "KPIのラベル",
+      "example": "顧客満足度スコア (CSAT)"
+    },
+    "image_logo": {
+      "placeholder": "{{image_logo}}",
+      "description": "ロゴ画像URL（image_ プレフィックスで画像として差し替え）",
+      "example": "https://example.com/zendesk-logo.png"
+    },
+    "image_chart": {
+      "placeholder": "{{image_chart}}",
+      "description": "チャート/グラフ画像URL",
+      "example": "https://example.com/chart.png"
+    }
+  },
+  "sample_data": {
+    "title": "Q1 2026 ビジネスレビュー",
+    "subtitle": "カスタマーサポート部門",
+    "date": "2026年3月9日",
+    "author": "Satoshi Ohata",
+    "section_title": "主要KPIの推移",
+    "body_text": "今四半期の顧客満足度は前期比5%向上し、解決時間は平均15%短縮されました。",
+    "metric_value": "92.5%",
+    "metric_label": "顧客満足度スコア (CSAT)"
+  }
+}

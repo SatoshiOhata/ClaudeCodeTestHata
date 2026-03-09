@@ -1,4 +1,9 @@
 *.json
 !package.json
 !package-lock.json
+!placeholder-mapping.json
 mcp-gsc/
+
+# 認証情報
+.env
+.env.local
